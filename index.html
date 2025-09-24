@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Pacing – The Art of Audio Timing</title>
+  <link rel="stylesheet" href="https://unpkg.com/h5p-standalone@1.3.0/dist/styles/h5p.css">
+  <script src="https://unpkg.com/h5p-standalone@1.3.0/dist/main.bundle.js"></script>
+  <style>
+    body { margin: 0; font-family: sans-serif; }
+    #h5p-container { width: 100%; height: 100vh; }
+  </style>
+</head>
+<body>
+  <div id="h5p-container"></div>
+
+  <script>
+    // Define H5P JSON inline (mini course presentation)
+    const h5pJson = {
+      "title": "Pacing – The Art of Audio Timing",
+      "mainLibrary": "H5P.CoursePresentation",
+      "language": "en",
+      "preloadedDependencies": [
+        { "machineName": "H5P.CoursePresentation", "majorVersion": 1, "minorVersion": 24 },
+        { "machineName": "H5P.Audio", "majorVersion": 1, "minorVersion": 5 },
+        { "machineName": "H5P.DragQuestion", "majorVersion": 1, "minorVersion": 13 },
+        { "machineName": "H5P.MultiChoice", "majorVersion": 1, "minorVersion": 15 }
+      ],
+      "content": {
+        "presentation": {
+          "slides": [
+            {
+              "elements": [
+                {
+                  "x": 5, "y": 5, "width": 90, "height": 20,
+                  "action": { "library": "H5P.Text 1.1", "params": {
+                    "text": "<h1>Pacing – The Art of Audio Timing</h1><p>In audio, timing creates mood, tension, and flow. Let’s explore how pacing shapes stories.</p>"
+                  }}
+                }
+              ]
+            },
+            {
+              "elements": [
+                {
+                  "x": 5, "y": 5, "width": 90, "height": 15,
+                  "action": { "library": "H5P.Text 1.1", "params": {
+                    "text": "<h2>Building Atmosphere Through Sound</h2><p>Unlike film, audio builds atmosphere gradually. Layered sounds create mood step by step.</p>"
+                  }}
+                },
+                {
+                  "x": 5, "y": 25, "width": 40, "height": 15,
+                  "action": { "library": "H5P.Audio 1.5", "params": {
+                    "files": [{ "path": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" }],
+                    "autoplay": false, "loop": false
+                  }, "subContentId": "silence1" }
+                },
+                {
+                  "x": 50, "y": 25, "width": 40, "height": 15,
+                  "action": { "library": "H5P.Audio 1.5", "params": {
+                    "files": [{ "path": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" }],
+                    "autoplay": false, "loop": false
+                  }, "subContentId": "wind1" }
+                }
+              ]
+            },
+            {
+              "elements": [
+                {
+                  "x": 5, "y": 5, "width": 90, "height": 15,
+                  "action": { "library": "H5P.Text 1.1", "params": {
+                    "text": "<h2>Strategic Pauses</h2><p>Sometimes silence is scarier than sound. Compare the two versions below.</p>"
+                  }}
+                },
+                {
+                  "x": 5, "y": 25, "width": 40, "height": 15,
+                  "action": { "library": "H5P.Audio 1.5", "params": {
+                    "files": [{ "path": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" }]
+                  }}
+                },
+                {
+                  "x": 50, "y": 25, "width": 40, "height": 15,
+                  "action": { "library": "H5P.Audio 1.5", "params": {
+                    "files": [{ "path": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3" }]
+                  }}
+                }
+              ]
+            },
+            {
+              "elements": [
+                {
+                  "x": 5, "y": 5, "width": 90, "height": 15,
+                  "action": { "library": "H5P.DragQuestion 1.13", "params": {
+                    "question": "Match pacing styles to their effect:",
+                    "taskDescription": "Drag the pacing style to the correct mood.",
+                    "dropZones": [
+                      { "label": "Action" },
+                      { "label": "Suspense" },
+                      { "label": "Emotional build" }
+                    ],
+                    "draggables": [
+                      { "label": "Fast dialogue", "correctDropZone": [0] },
+                      { "label": "Slow, deliberate speech", "correctDropZone": [1] },
+                      { "label": "Music heartbeat", "correctDropZone": [2] }
+                    ]
+                  }}
+                }
+              ]
+            },
+            {
+              "elements": [
+                {
+                  "x": 5, "y": 5, "width": 90, "height": 15,
+                  "action": { "library": "H5P.MultiChoice 1.15", "params": {
+                    "question": "Which technique lets a scary moment 'breathe'?",
+                    "answers": [
+                      { "text": "Faster dialogue", "correct": false },
+                      { "text": "Louder background noise", "correct": false },
+                      { "text": "Silence / pause", "correct": true }
+                    ],
+                    "behaviour": { "singlePoint": true }
+                  }}
+                }
+              ]
+            },
+            {
+              "elements": [
+                {
+                  "x": 5, "y": 5, "width": 90, "height": 20,
+                  "action": { "library": "H5P.Text 1.1", "params": {
+                    "text": "<h2>Great work!</h2><p>You’ve explored how pacing shapes audio drama. Think about how you can use timing in your own podcast or audio story.</p>"
+                  }}
+                }
+              ]
+            }
+          ]
+        }
+      }
+    };
+
+    // Render H5P inline
+    new H5PStandalone.H5P(document.getElementById('h5p-container'), {
+      h5pContent: h5pJson,
+      frameJs: 'https://unpkg.com/h5p-standalone@1.3.0/dist/frame.bundle.js',
+      frameCss: 'https://unpkg.com/h5p-standalone@1.3.0/dist/styles/h5p.css'
+    });
+  </script>
+</body>
+</html>
