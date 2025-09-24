@@ -1,1 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Pacing – The Art of Audio Timing</title>
+<style>
+body { margin:0; font-family:sans-serif; background:#f0f0f0; display:flex; flex-direction:column; height:100vh; }
+#slide-container { flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; position:relative; overflow:hidden; }
+.slide { position:absolute; width:90%; max-width:800px; opacity:0; transition:opacity 0.5s ease-in-out; text-align:left; }
+.slide.active { opacity:1; }
+h1,h2,p { margin:10px 0; }
+#audio-buttons { margin-top:20px; }
+.audio-btn { display:inline-block; width:24px; height:24px; margin-right:10px; border-radius:50%; background:#4CAF50; cursor:pointer; transition:0.3s; }
+.audio-btn.playing { background:#FF5722; }
+#nav { height:50px; display:flex; justify-content:center; align-items:center; background:#222; color:#fff; }
+#nav button { margin:0 10px; padding:8px 16px; font-size:16px; cursor:pointer; border-radius:5px; border:none; background:#4CAF50; color:white; transition:0.3s; }
+#nav button:hover { background:#45a049; }
+#progress-bar { height:5px; background:#4CAF50; transition:width 0.3s; }
+</style>
+</head>
+<body>
 
+<div id="slide-container">
+  <div class="slide active" data-slide="0">
+    <h1>Pacing – The Art of Audio Timing</h1>
+    <p>In audio, timing creates mood, tension, and flow. Let’s explore how pacing shapes stories.</p>
+  </div>
+
+  <div class="slide" data-slide="1">
+    <h2>Building Atmosphere Through Sound</h2>
+    <p>Layer sounds gradually to build mood:</p>
+    <div id="audio-buttons">
+      <div class="audio-btn" data-src="data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU5LjI3LjEwMAAAAAAAAAAAAAAA/+NAwAAAAAAAAAAAAEluZm8AAAAPAAAAFgAACcsA" title="Silence"></div>
+      <div class="audio-btn" data-src="data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU5LjI3LjEwMAAAAAAAAAAAAAAA//tAwAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8A" title="Wind"></div>
+      <div class="audio-btn" data-src="data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU5LjI3LjEwMAAAAAAAAAAAAAAA//tAwAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8A" title="Creak"></div>
+      <div class="audio-btn" data-src="data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU5LjI3LjEwMAAAAAAAAAAAAAAA//tAwAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8A" title="Door Slam"></div>
+    </div>
+  </div>
+
+  <div class="slide" data-slide="2">
+    <h2>Strategic Pauses</h2>
+    <p>Silence can be more powerful than noise. Let scary moments "breathe".</p>
+    <div id="audio-buttons">
+      <div class="audio-btn" data-src="data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU5LjI3LjEwMAAAAAAAAAAAAAAA/+NAwAAAAAAAAAAAAEluZm8AAAAPAAAAFgAACcsA" title="Silence"></div>
+      <div class="audio-btn" data-src="data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU5LjI3LjEwMAAAAAAAAAAAAAAA//tAwAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8A" title="Wind"></div>
+    </div>
+  </div>
+
+  <div class="slide" data-slide="3">
+    <h2>Rhythm & Flow</h2>
+    <p>Fast dialogue for action scenes, slow for tension, music matches heartbeat.</p>
+  </div>
+
+  <div class="slide" data-slide="4">
+    <h2>Mini Quiz</h2>
+    <p>Which technique lets a scary moment "breathe"?</p>
+    <button onclick="alert('Correct! Silence/pause is the right choice.')">Silence / Pause</button>
+    <button onclick="alert('Try again!')">Faster Dialogue</button>
+    <button onclick="alert('Try again!')">Louder Noise</button>
+  </div>
+
+  <div class="slide" data-slide="5">
+    <h2>Great work!</h2>
+    <p>You’ve explored how pacing shapes audio drama. Think about timing in your own podcast or audio story.</p>
+  </div>
+</div>
+
+<div id="nav">
+  <button id="prevBtn">Previous</button>
+  <span id="slide-count">Slide 1 / 6</span>
+  <button id="nextBtn">Next</button>
+  <div id="progress-bar" style="position:absolute; bottom:0; left:0; width:0%;"></div>
+</div>
+
+<script>
+const slides = document.querySelectorAll('.slide');
+let currentSlide = 0;
+
+function showSlide(index){
+  slides.forEach((s,i)=>{ s.classList.remove('active'); });
+  slides[index].classList.add('active');
+  document.getElementById('slide-count').textContent = `Slide ${index+1} / ${slides.length}`;
+  document.getElementById('progress-bar').style.width = `${((index+1)/slides.length)*100}%`;
+}
+
+document.getElementById('prevBtn').addEventListener('click', ()=>{
+  if(currentSlide>0){ currentSlide--; showSlide(currentSlide);}
+});
+document.getElementById('nextBtn').addEventListener('click', ()=>{
+  if(currentSlide<slides.length-1){ currentSlide++; showSlide(currentSlide);}
+});
+showSlide(currentSlide);
+
+// Audio buttons
+document.querySelectorAll('.audio-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const audio = new Audio(btn.dataset.src);
+    audio.play();
+    btn.classList.add('playing');
+    audio.onended = ()=> btn.classList.remove('playing');
+  });
+});
+</script>
+</body>
+</html>
