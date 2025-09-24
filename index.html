@@ -1,1 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Pacing – The Art of Audio Timing</title>
+<style>
+body { margin:0; font-family:sans-serif; background:#111; color:#fff; display:flex; flex-direction:column; height:100vh; overflow:hidden; }
+#slide-container { flex:1; position:relative; overflow:hidden; }
+.slide { position:absolute; top:0; left:100%; width:100%; height:100%; padding:40px; box-sizing:border-box; transition:left 0.7s ease; display:flex; flex-direction:column; justify-content:center; align-items:flex-start; }
+.slide.active { left:0; }
+h1,h2,p { margin:10px 0; animation: fadeIn 1s forwards; opacity:0; }
+h1 { font-size:2em; }
+h2 { font-size:1.5em; }
+@keyframes fadeIn { to { opacity:1; } }
+#audio-buttons { margin:20px 0; display:flex; gap:15px; }
+.audio-btn { display:flex; align-items:center; justify-content:center; width:50px; height:50px; border-radius:50%; background:#4CAF50; cursor:pointer; transition:0.3s; font-size:24px; }
+.audio-btn.playing { background:#FF5722; animation: bounce 0.5s; }
+@keyframes bounce { 0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);} }
+#nav { height:60px; display:flex; justify-content:space-between; align-items:center; background:#222; padding:0 20px; box-sizing:border-box; }
+#nav button { padding:10px 20px; font-size:16px; cursor:pointer; border-radius:5px; border:none; background:#4CAF50; color:white; transition:0.3s; }
+#nav button:hover { background:#45a049; }
+#score { font-size:16px; }
+#progress-bar-container { width:100%; height:5px; background:#333; }
+#progress-bar { height:5px; background:linear-gradient(to right,#4CAF50,#00e0ff); width:0%; transition:width 0.5s; }
+.badge { margin-left:10px; font-size:24px; opacity:0; transition:opacity 0.5s; }
+.badge.visible { opacity:1; animation: bounce 0.5s; }
+</style>
+</head>
+<body>
 
+<div id="slide-container">
+  <!-- Slide 0 -->
+  <div class="slide active" data-slide="0" style="background:linear-gradient(135deg,#ff7e5f,#feb47b);">
+    <h1>Pacing – The Art of Audio Timing</h1>
+    <p>Timing creates mood, tension, and flow. Let’s explore how pacing shapes stories.</p>
+  </div>
+
+  <!-- Slide 1 -->
+  <div class="slide" data-slide="1" style="background:linear-gradient(135deg,#6a11cb,#2575fc);">
+    <h2>Building Atmosphere Through Sound</h2>
+    <p>Click the sounds to experience layering and earn points!</p>
+    <div id="audio-buttons">
+      <div class="audio-btn" data-src="data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU5LjI3LjEwMAAAAAAAAAAAAAAA/+NAwAAAAAAAAAAAAEluZm8AAAAPAAAAFgAACcsA" title="Silence">🤫</div>
+      <div class="audio-btn" data-src="data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU5LjI3LjEwMAAAAAAAAAAAAAAA//tAwAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8A" title="Wind">🌬️</div>
+      <div class="audio-btn" data-src="data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU5LjI3LjEwMAAAAAAAAAAAAAAA//tAwAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8A" title="Creak">🪵</div>
+      <div class="audio-btn" data-src="data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU5LjI3LjEwMAAAAAAAAAAAAAAA//tAwAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8A" title="Door Slam">🚪</div>
+    </div>
+    <span class="badge" id="badge-audio">🎧 +10</span>
+  </div>
+
+  <!-- Slide 2 -->
+  <div class="slide" data-slide="2" style="background:linear-gradient(135deg,#11998e,#38ef7d);">
+    <h2>Strategic Pauses</h2>
+    <p>Silence can be more powerful than noise. Let scary moments "breathe".</p>
+    <div id="audio-buttons">
+      <div class="audio-btn" data-src="data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU5LjI3LjEwMAAAAAAAAAAAAAAA/+NAwAAAAAAAAAAAAEluZm8AAAAPAAAAFgAACcsA" title="Silence">🤫</div>
+      <div class="audio-btn" data-src="data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU5LjI3LjEwMAAAAAAAAAAAAAAA//tAwAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8A" title="Wind">🌬️</div>
+    </div>
+    <span class="badge" id="badge-audio2">🎧 +10</span>
+  </div>
+
+  <!-- Slide 3 -->
+  <div class="slide" data-slide="3" style="background:linear-gradient(135deg,#f7971e,#ffd200);">
+    <h2>Rhythm & Flow</h2>
+    <p>Fast dialogue for action, slow for tension, music matches heartbeat.</p>
+  </div>
+
+  <!-- Slide 4 -->
+  <div class="slide" data-slide="4" style="background:linear-gradient(135deg,#00c6ff,#0072ff);">
+    <h2>Mini Quiz</h2>
+    <p>Which technique lets a scary moment "breathe"?</p>
+    <button onclick="quizAnswer(true)">Silence / Pause ✅</button>
+    <button onclick="quizAnswer(false)">Faster Dialogue ❌</button>
+    <button onclick="quizAnswer(false)">Louder Noise ❌</button>
+    <span class="badge" id="badge-quiz">🏆 +20</span>
+  </div>
+
+  <!-- Slide 5 -->
+  <div class="slide" data-slide="5" style="background:linear-gradient(135deg,#ee9ca7,#ffdde1);">
+    <h2>Great work!</h2>
+    <p>You’ve explored how pacing shapes audio drama. Your total points: <span id="total-points">0</span> 🎉</p>
+  </div>
+
+</div>
+
+<div id="nav">
+  <button id="prevBtn">Previous</button>
+  <span id="slide-count">Slide 1 / 6</span>
+  <button id="nextBtn">Next</button>
+</div>
+<div id="progress-bar-container">
+  <div id="progress-bar"></div>
+</div>
+
+<script>
+const slides = document.querySelectorAll('.slide');
+let currentSlide = 0;
+let points = 0;
+
+function showSlide(index){
+  slides.forEach((s,i)=> s.classList.remove('active'));
+  slides[index].classList.add('active');
+  document.getElementById('slide-count').textContent = `Slide ${index+1} / ${slides.length}`;
+  document.getElementById('progress-bar').style.width = `${((index+1)/slides.length)*100}%`;
+  // update total points display if on final slide
+  if(index === slides.length-1) document.getElementById('total-points').textContent = points;
+}
+showSlide(currentSlide);
+
+document.getElementById('prevBtn').addEventListener('click', ()=>{
+  if(currentSlide>0){ currentSlide--; showSlide(currentSlide);}
+});
+document.getElementById('nextBtn').addEventListener('click', ()=>{
+  if(currentSlide<slides.length-1){ currentSlide++; showSlide(currentSlide);}
+});
+
+// Audio interaction
+document.querySelectorAll('.audio-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const audio = new Audio(btn.dataset.src);
+    audio.play();
+    btn.classList.add('playing');
+    audio.onended = ()=> btn.classList.remove('playing');
+    // Add points once per click per badge
+    const badgeId = btn.closest('.slide').querySelector('.badge').id;
+    const badge = document.getElementById(badgeId);
+    if(!badge.classList.contains('visible')) {
+      points += 10;
+      badge.classList.add('visible');
+    }
+  });
+});
+
+// Quiz interaction
+function quizAnswer(correct){
+  const badge = document.getElementById('badge-quiz');
+  if(correct && !badge.classList.contains('visible')){
+    points += 20;
+    badge.classList.add('visible');
+    alert('Boom! Correct ✅ +20 points');
+  } else if(!correct){
+    alert('Oops! Try again 😅');
+  }
+}
+</script>
+
+</body>
+</html>
