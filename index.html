@@ -1,148 +1,602 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Pacing – The Art of Audio Timing</title>
-<style>
-body { margin:0; font-family:sans-serif; background:#111; color:#fff; display:flex; flex-direction:column; height:100vh; overflow:hidden; }
-#slide-container { flex:1; position:relative; overflow:hidden; }
-.slide { position:absolute; top:0; left:100%; width:100%; height:100%; padding:40px; box-sizing:border-box; transition:left 0.7s ease; display:flex; flex-direction:column; justify-content:center; align-items:flex-start; }
-.slide.active { left:0; }
-h1,h2,p { margin:10px 0; animation: fadeIn 1s forwards; opacity:0; }
-h1 { font-size:2em; }
-h2 { font-size:1.5em; }
-@keyframes fadeIn { to { opacity:1; } }
-#audio-buttons { margin:20px 0; display:flex; gap:15px; }
-.audio-btn { display:flex; align-items:center; justify-content:center; width:50px; height:50px; border-radius:50%; background:#4CAF50; cursor:pointer; transition:0.3s; font-size:24px; }
-.audio-btn.playing { background:#FF5722; animation: bounce 0.5s; }
-@keyframes bounce { 0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);} }
-#nav { height:60px; display:flex; justify-content:space-between; align-items:center; background:#222; padding:0 20px; box-sizing:border-box; }
-#nav button { padding:10px 20px; font-size:16px; cursor:pointer; border-radius:5px; border:none; background:#4CAF50; color:white; transition:0.3s; }
-#nav button:hover { background:#45a049; }
-#score { font-size:16px; }
-#progress-bar-container { width:100%; height:5px; background:#333; }
-#progress-bar { height:5px; background:linear-gradient(to right,#4CAF50,#00e0ff); width:0%; transition:width 0.5s; }
-.badge { margin-left:10px; font-size:24px; opacity:0; transition:opacity 0.5s; }
-.badge.visible { opacity:1; animation: bounce 0.5s; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Pacing - The Art of Audio Timing</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            padding: 40px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .section h2 {
+            color: #2c3e50;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .interactive-demo {
+            background: #fff;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+
+        .demo-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .demo-button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .demo-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .demo-button:active {
+            transform: translateY(0);
+        }
+
+        .demo-button.playing {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(231, 76, 60, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
+        }
+
+        .sound-layer {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            padding: 15px;
+            background: #f1f3f4;
+            border-radius: 8px;
+            transition: all 0.5s ease;
+        }
+
+        .sound-layer.active {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            border-left: 4px solid #28a745;
+            transform: translateX(5px);
+        }
+
+        .sound-icon {
+            font-size: 24px;
+            margin-right: 15px;
+            width: 30px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 10px;
+        }
+
+        .quiz-section {
+            background: linear-gradient(135deg, #ffecd2, #fcb69f);
+            border-radius: 12px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+
+        .quiz-question {
+            font-size: 1.3em;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .quiz-options {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .quiz-option {
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+        }
+
+        .quiz-option:hover {
+            border-color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .quiz-option.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .quiz-option.correct {
+            background: #28a745;
+            color: white;
+            border-color: #28a745;
+        }
+
+        .quiz-option.incorrect {
+            background: #dc3545;
+            color: white;
+            border-color: #dc3545;
+        }
+
+        .feedback {
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        .feedback.correct {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .feedback.incorrect {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .tip-box {
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .tip-box h3 {
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .scenario-builder {
+            background: #fff;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+
+        .scenario-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .control-label {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+        }
+
+        .result-display {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            border-left: 4px solid #667eea;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .main-content {
+                padding: 20px;
+            }
+            
+            .demo-controls {
+                justify-content: center;
+            }
+            
+            .scenario-controls {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
+    <div class="container">
+        <div class="header">
+            <h1>🎧 Audio Pacing</h1>
+            <p class="subtitle">The Art of Audio Timing</p>
+        </div>
 
-<div id="slide-container">
-  <!-- Slide 0 -->
-  <div class="slide active" data-slide="0" style="background:linear-gradient(135deg,#ff7e5f,#feb47b);">
-    <h1>Pacing – The Art of Audio Timing</h1>
-    <p>Timing creates mood, tension, and flow. Let’s explore how pacing shapes stories.</p>
-  </div>
+        <div class="main-content">
+            <!-- Building Atmosphere Section -->
+            <div class="section">
+                <h2>🏚️ Building Atmosphere Through Sound</h2>
+                <p>In visual media, you can show a creepy house in one shot. In audio, you need to build that creepiness slowly through layered sounds...</p>
+                
+                <div class="interactive-demo">
+                    <h3>Interactive Demo: Layered Sounds</h3>
+                    <p>Click the buttons below to build a creepy atmosphere layer by layer:</p>
+                    
+                    <div class="demo-controls">
+                        <button class="demo-button" data-layer="0">🔇 Start with Silence</button>
+                        <button class="demo-button" data-layer="1">💨 Add Distant Wind</button>
+                        <button class="demo-button" data-layer="2">🏠 Include Creaking Floorboards</button>
+                        <button class="demo-button" data-layer="3">🚪 Build to Door Slam</button>
+                        <button class="demo-button" id="reset-demo">🔄 Reset</button>
+                    </div>
 
-  <!-- Slide 1 -->
-  <div class="slide" data-slide="1" style="background:linear-gradient(135deg,#6a11cb,#2575fc);">
-    <h2>Building Atmosphere Through Sound</h2>
-    <p>Click the sounds to experience layering and earn points!</p>
-    <div id="audio-buttons">
-      <div class="audio-btn" data-src="data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU5LjI3LjEwMAAAAAAAAAAAAAAA/+NAwAAAAAAAAAAAAEluZm8AAAAPAAAAFgAACcsA" title="Silence">🤫</div>
-      <div class="audio-btn" data-src="data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU5LjI3LjEwMAAAAAAAAAAAAAAA//tAwAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8A" title="Wind">🌬️</div>
-      <div class="audio-btn" data-src="data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU5LjI3LjEwMAAAAAAAAAAAAAAA//tAwAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8A" title="Creak">🪵</div>
-      <div class="audio-btn" data-src="data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU5LjI3LjEwMAAAAAAAAAAAAAAA//tAwAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8A" title="Door Slam">🚪</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="atmosphere-progress"></div>
+                    </div>
+
+                    <div class="sound-layers">
+                        <div class="sound-layer" data-layer="0">
+                            <span class="sound-icon">🔇</span>
+                            <span>Complete Silence - Setting the Stage</span>
+                        </div>
+                        <div class="sound-layer" data-layer="1">
+                            <span class="sound-icon">💨</span>
+                            <span>Distant Wind - Creating Unease</span>
+                        </div>
+                        <div class="sound-layer" data-layer="2">
+                            <span class="sound-icon">🏠</span>
+                            <span>Creaking Floorboards - Building Tension</span>
+                        </div>
+                        <div class="sound-layer" data-layer="3">
+                            <span class="sound-icon">🚪</span>
+                            <span>Door Slam - The Climax</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tip-box">
+                    <h3>💡 Pro Tip</h3>
+                    <p>Each layer should complement the previous ones, not overwhelm them. Think of it like painting - you're adding depth and texture to create the full picture.</p>
+                </div>
+            </div>
+
+            <!-- Strategic Pauses Section -->
+            <div class="section">
+                <h2>⏸️ Strategic Pauses</h2>
+                <p>Silence can be more powerful than noise. Learn how to use pauses effectively...</p>
+                
+                <div class="interactive-demo">
+                    <h3>Pause Impact Simulator</h3>
+                    <p>Experience how different pause lengths affect tension:</p>
+                    
+                    <div class="demo-controls">
+                        <button class="demo-button" data-pause="0">No Pause</button>
+                        <button class="demo-button" data-pause="1">Short Pause (1s)</button>
+                        <button class="demo-button" data-pause="3">Medium Pause (3s)</button>
+                        <button class="demo-button" data-pause="5">Long Pause (5s)</button>
+                    </div>
+
+                    <div class="result-display" id="pause-result">
+                        <strong>Select a pause length to see its effect on storytelling...</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rhythm and Flow Section -->
+            <div class="section">
+                <h2>🎵 Rhythm and Flow</h2>
+                <p>Match your audio pacing to your story's heartbeat...</p>
+                
+                <div class="scenario-builder">
+                    <h3>Scenario Builder</h3>
+                    <p>Create different moods by adjusting the audio elements:</p>
+                    
+                    <div class="scenario-controls">
+                        <div class="control-group">
+                            <label class="control-label">Dialogue Speed</label>
+                            <input type="range" min="1" max="10" value="5" class="slider" id="dialogueSpeed">
+                            <span id="dialogueSpeedValue">Normal (5)</span>
+                        </div>
+                        
+                        <div class="control-group">
+                            <label class="control-label">Music Tempo</label>
+                            <input type="range" min="1" max="10" value="5" class="slider" id="musicTempo">
+                            <span id="musicTempoValue">Moderate (5)</span>
+                        </div>
+                        
+                        <div class="control-group">
+                            <label class="control-label">Pause Frequency</label>
+                            <input type="range" min="1" max="10" value="5" class="slider" id="pauseFreq">
+                            <span id="pauseFreqValue">Balanced (5)</span>
+                        </div>
+                    </div>
+
+                    <div class="result-display" id="scenario-result">
+                        <strong>Scene Type:</strong> <span id="sceneType">Neutral</span><br>
+                        <strong>Emotional Impact:</strong> <span id="emotionalImpact">Calm</span><br>
+                        <strong>Best Used For:</strong> <span id="bestUse">General storytelling</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quiz Section -->
+            <div class="quiz-section">
+                <div class="quiz-question">
+                    🧠 Quick Check: Which technique is most effective for building suspense in audio drama?
+                </div>
+                
+                <div class="quiz-options">
+                    <div class="quiz-option" data-answer="A">A) Adding all sound effects at once for maximum impact</div>
+                    <div class="quiz-option" data-answer="B">B) Layering sounds gradually and using strategic pauses</div>
+                    <div class="quiz-option" data-answer="C">C) Speaking as fast as possible to create excitement</div>
+                    <div class="quiz-option" data-answer="D">D) Using only music without any sound effects</div>
+                </div>
+                
+                <div class="feedback" id="quiz-feedback" style="display: none;"></div>
+            </div>
+        </div>
     </div>
-    <span class="badge" id="badge-audio">🎧 +10</span>
-  </div>
 
-  <!-- Slide 2 -->
-  <div class="slide" data-slide="2" style="background:linear-gradient(135deg,#11998e,#38ef7d);">
-    <h2>Strategic Pauses</h2>
-    <p>Silence can be more powerful than noise. Let scary moments "breathe".</p>
-    <div id="audio-buttons">
-      <div class="audio-btn" data-src="data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU5LjI3LjEwMAAAAAAAAAAAAAAA/+NAwAAAAAAAAAAAAEluZm8AAAAPAAAAFgAACcsA" title="Silence">🤫</div>
-      <div class="audio-btn" data-src="data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU5LjI3LjEwMAAAAAAAAAAAAAAA//tAwAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8A" title="Wind">🌬️</div>
-    </div>
-    <span class="badge" id="badge-audio2">🎧 +10</span>
-  </div>
+    <script>
+        // Atmosphere building demo
+        let currentLayer = -1;
+        const maxLayers = 4;
+        
+        document.querySelectorAll('[data-layer]').forEach(button => {
+            button.addEventListener('click', function() {
+                const layer = parseInt(this.getAttribute('data-layer'));
+                
+                if (layer <= currentLayer + 1) {
+                    currentLayer = layer;
+                    updateAtmosphere();
+                }
+            });
+        });
 
-  <!-- Slide 3 -->
-  <div class="slide" data-slide="3" style="background:linear-gradient(135deg,#f7971e,#ffd200);">
-    <h2>Rhythm & Flow</h2>
-    <p>Fast dialogue for action, slow for tension, music matches heartbeat.</p>
-  </div>
+        document.getElementById('reset-demo').addEventListener('click', function() {
+            currentLayer = -1;
+            updateAtmosphere();
+        });
 
-  <!-- Slide 4 -->
-  <div class="slide" data-slide="4" style="background:linear-gradient(135deg,#00c6ff,#0072ff);">
-    <h2>Mini Quiz</h2>
-    <p>Which technique lets a scary moment "breathe"?</p>
-    <button onclick="quizAnswer(true)">Silence / Pause ✅</button>
-    <button onclick="quizAnswer(false)">Faster Dialogue ❌</button>
-    <button onclick="quizAnswer(false)">Louder Noise ❌</button>
-    <span class="badge" id="badge-quiz">🏆 +20</span>
-  </div>
+        function updateAtmosphere() {
+            const progress = document.getElementById('atmosphere-progress');
+            const layers = document.querySelectorAll('.sound-layer');
+            
+            // Update progress bar
+            progress.style.width = ((currentLayer + 1) / maxLayers * 100) + '%';
+            
+            // Update layer visibility
+            layers.forEach((layer, index) => {
+                if (index <= currentLayer) {
+                    layer.classList.add('active');
+                } else {
+                    layer.classList.remove('active');
+                }
+            });
+        }
 
-  <!-- Slide 5 -->
-  <div class="slide" data-slide="5" style="background:linear-gradient(135deg,#ee9ca7,#ffdde1);">
-    <h2>Great work!</h2>
-    <p>You’ve explored how pacing shapes audio drama. Your total points: <span id="total-points">0</span> 🎉</p>
-  </div>
+        // Pause impact simulator
+        const pauseTexts = {
+            0: "The dialogue flows continuously without breaks. This creates urgency but might feel rushed and doesn't give listeners time to absorb the tension.",
+            1: "A brief pause adds subtle emphasis. Good for natural conversation flow and light dramatic moments.",
+            3: "A medium pause creates noticeable tension. Perfect for dramatic reveals or letting important information sink in.",
+            5: "A long pause builds maximum suspense. Use sparingly for major plot points or to create genuine unease."
+        };
 
-</div>
+        document.querySelectorAll('[data-pause]').forEach(button => {
+            button.addEventListener('click', function() {
+                const pauseLength = this.getAttribute('data-pause');
+                const resultDiv = document.getElementById('pause-result');
+                
+                // Remove playing class from all buttons
+                document.querySelectorAll('[data-pause]').forEach(btn => {
+                    btn.classList.remove('playing');
+                });
+                
+                // Add playing class to current button
+                this.classList.add('playing');
+                
+                // Show result after simulated pause
+                setTimeout(() => {
+                    resultDiv.innerHTML = `<strong>${pauseLength}s Pause:</strong> ${pauseTexts[pauseLength]}`;
+                    this.classList.remove('playing');
+                }, pauseLength * 200); // Shortened for demo purposes
+            });
+        });
 
-<div id="nav">
-  <button id="prevBtn">Previous</button>
-  <span id="slide-count">Slide 1 / 6</span>
-  <button id="nextBtn">Next</button>
-</div>
-<div id="progress-bar-container">
-  <div id="progress-bar"></div>
-</div>
+        // Scenario builder
+        const sliders = {
+            dialogueSpeed: document.getElementById('dialogueSpeed'),
+            musicTempo: document.getElementById('musicTempo'),
+            pauseFreq: document.getElementById('pauseFreq')
+        };
 
-<script>
-const slides = document.querySelectorAll('.slide');
-let currentSlide = 0;
-let points = 0;
+        const valueDisplays = {
+            dialogueSpeed: document.getElementById('dialogueSpeedValue'),
+            musicTempo: document.getElementById('musicTempoValue'),
+            pauseFreq: document.getElementById('pauseFreqValue')
+        };
 
-function showSlide(index){
-  slides.forEach((s,i)=> s.classList.remove('active'));
-  slides[index].classList.add('active');
-  document.getElementById('slide-count').textContent = `Slide ${index+1} / ${slides.length}`;
-  document.getElementById('progress-bar').style.width = `${((index+1)/slides.length)*100}%`;
-  // update total points display if on final slide
-  if(index === slides.length-1) document.getElementById('total-points').textContent = points;
-}
-showSlide(currentSlide);
+        function updateScenario() {
+            const values = {
+                dialogue: parseInt(sliders.dialogueSpeed.value),
+                music: parseInt(sliders.musicTempo.value),
+                pauses: parseInt(sliders.pauseFreq.value)
+            };
 
-document.getElementById('prevBtn').addEventListener('click', ()=>{
-  if(currentSlide>0){ currentSlide--; showSlide(currentSlide);}
-});
-document.getElementById('nextBtn').addEventListener('click', ()=>{
-  if(currentSlide<slides.length-1){ currentSlide++; showSlide(currentSlide);}
-});
+            // Update value displays
+            const speedLabels = ['Very Slow', 'Slow', 'Slow', 'Moderate', 'Moderate', 'Normal', 'Moderate', 'Fast', 'Fast', 'Very Fast', 'Rapid'];
+            const tempoLabels = ['Very Slow', 'Slow', 'Slow', 'Gentle', 'Gentle', 'Moderate', 'Upbeat', 'Fast', 'Fast', 'Very Fast', 'Frantic'];
+            const pauseLabels = ['Minimal', 'Few', 'Few', 'Some', 'Some', 'Balanced', 'Many', 'Frequent', 'Frequent', 'Very Frequent', 'Constant'];
 
-// Audio interaction
-document.querySelectorAll('.audio-btn').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    const audio = new Audio(btn.dataset.src);
-    audio.play();
-    btn.classList.add('playing');
-    audio.onended = ()=> btn.classList.remove('playing');
-    // Add points once per click per badge
-    const badgeId = btn.closest('.slide').querySelector('.badge').id;
-    const badge = document.getElementById(badgeId);
-    if(!badge.classList.contains('visible')) {
-      points += 10;
-      badge.classList.add('visible');
-    }
-  });
-});
+            valueDisplays.dialogueSpeed.textContent = `${speedLabels[values.dialogue-1]} (${values.dialogue})`;
+            valueDisplays.musicTempo.textContent = `${tempoLabels[values.music-1]} (${values.music})`;
+            valueDisplays.pauseFreq.textContent = `${pauseLabels[values.pauses-1]} (${values.pauses})`;
 
-// Quiz interaction
-function quizAnswer(correct){
-  const badge = document.getElementById('badge-quiz');
-  if(correct && !badge.classList.contains('visible')){
-    points += 20;
-    badge.classList.add('visible');
-    alert('Boom! Correct ✅ +20 points');
-  } else if(!correct){
-    alert('Oops! Try again 😅');
-  }
-}
-</script>
+            // Determine scene type and impact
+            const average = (values.dialogue + values.music + values.pauses) / 3;
+            let sceneType, emotionalImpact, bestUse;
 
+            if (average <= 3) {
+                sceneType = "Contemplative/Tense";
+                emotionalImpact = "Suspenseful, thoughtful";
+                bestUse = "Horror, drama, emotional scenes";
+            } else if (average <= 6) {
+                sceneType = "Balanced Narrative";
+                emotionalImpact = "Neutral, engaging";
+                bestUse = "General storytelling, dialogue-heavy scenes";
+            } else {
+                sceneType = "High Energy/Action";
+                emotionalImpact = "Exciting, intense";
+                bestUse = "Action sequences, comedy, chase scenes";
+            }
+
+            document.getElementById('sceneType').textContent = sceneType;
+            document.getElementById('emotionalImpact').textContent = emotionalImpact;
+            document.getElementById('bestUse').textContent = bestUse;
+        }
+
+        // Add event listeners to sliders
+        Object.values(sliders).forEach(slider => {
+            slider.addEventListener('input', updateScenario);
+        });
+
+        // Initialize scenario
+        updateScenario();
+
+        // Quiz functionality
+        document.querySelectorAll('.quiz-option').forEach(option => {
+            option.addEventListener('click', function() {
+                const answer = this.getAttribute('data-answer');
+                const feedback = document.getElementById('quiz-feedback');
+                
+                // Remove previous selections
+                document.querySelectorAll('.quiz-option').forEach(opt => {
+                    opt.classList.remove('selected', 'correct', 'incorrect');
+                });
+                
+                this.classList.add('selected');
+                
+                if (answer === 'B') {
+                    this.classList.add('correct');
+                    feedback.className = 'feedback correct';
+                    feedback.innerHTML = '✅ <strong>Correct!</strong> Layering sounds gradually and using strategic pauses is the most effective technique for building suspense. It allows tension to build naturally and gives listeners time to absorb and imagine.';
+                } else {
+                    this.classList.add('incorrect');
+                    feedback.className = 'feedback incorrect';
+                    feedback.innerHTML = '❌ <strong>Not quite.</strong> While this might seem effective, the best approach is to layer sounds gradually and use strategic pauses. This builds suspense naturally and engages the listener\'s imagination.';
+                }
+                
+                feedback.style.display = 'block';
+            });
+        });
+
+        // Initialize atmosphere demo
+        updateAtmosphere();
+    </script>
 </body>
 </html>
